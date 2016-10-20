@@ -8,12 +8,14 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import java.text.NumberFormat;
 import java.util.Locale;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
 /**
  * Created by cybersapien on 20/10/16.
+ * This Class defines a custom cursor Adapter for the Items in the Stock Inventory.
  */
 
 public class ItemCursorAdapter extends CursorAdapter {
@@ -45,13 +47,13 @@ public class ItemCursorAdapter extends CursorAdapter {
 
         //Get values for the fields
         String itemName = cursor.getString(nameIndex);
-        Integer price = cursor.getInt(priceIndex);
+        Float price = cursor.getFloat(priceIndex);
         Integer quantity = cursor.getInt(quantityIndex);
 
         //Set values to the respective TextViews
         item_name_view.setText(itemName);
-        item_price_view.setText(price.toString());
-        item_quantity_view.setText(quantity.toString());
+        item_price_view.setText(NumberFormat.getCurrencyInstance().format(price));
+        item_quantity_view.setText(NumberFormat.getInstance().format(quantity));
 
     }
 }
