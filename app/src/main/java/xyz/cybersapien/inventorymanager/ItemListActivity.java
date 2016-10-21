@@ -1,6 +1,7 @@
 package xyz.cybersapien.inventorymanager;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -40,8 +42,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Implement onClick method.
-                Intent intent = new Intent(getBaseContext(), NewItem.class);
+                Intent intent = new Intent(getBaseContext(), ItemEditorActivity.class);
                 startActivity(intent);
             }
         });
@@ -54,6 +55,16 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
         itemsListView.setEmptyView(hintView);
         customCursorAdapter = new ItemCursorAdapter(this, null);
         itemsListView.setAdapter(customCursorAdapter);
+
+        itemsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Uri itemUri = ContentUris.withAppendedId(StockContract.ItemEntry.ITEMS_CONTENT_URI,id);
+                Intent intent = new Intent(getBaseContext(), ItemEditorActivity.class);
+                intent.setData(itemUri);
+                startActivity(intent);
+            }
+        });
 
         //Start the Loader
         getLoaderManager().initLoader(STOCK_LOADER, null, this);
@@ -77,7 +88,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
                 startActivity(goToSupplier);
                 break;
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(ItemListActivity.this);
+                finish();
                 break;
         }
         return true;

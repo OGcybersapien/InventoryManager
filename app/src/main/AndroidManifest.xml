@@ -34,7 +34,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".NewItem"></activity>
+        <activity android:name=".ItemEditorActivity"
+            android:parentActivityName=".ItemListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ItemListActivity"/>
+        </activity>
     </application>
 
 </manifest>

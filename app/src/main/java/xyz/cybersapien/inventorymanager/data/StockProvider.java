@@ -199,18 +199,6 @@ public class StockProvider extends ContentProvider {
         return rowsUpdated;
     }
 
-    private int updateSupplier(ContentValues values, String selection, String[] selectionArgs) {
-
-        if (values.size()==0){
-            return 0;
-        }
-
-        //TODO: Add Validation Logic
-
-        SQLiteDatabase db = stockDbHelper.getWritableDatabase();
-        return db.update(StockContract.SuppliersEntry.TABLE_NAME, values,selection,selectionArgs);
-    }
-
     private int updateItem(ContentValues values, String selection, String[] selectionArgs) {
         if (values.size() == 0){
             return 0;
@@ -232,5 +220,12 @@ public class StockProvider extends ContentProvider {
         return db.insert(StockContract.SuppliersEntry.TABLE_NAME, null,values);
     }
 
-
+    private int updateSupplier(ContentValues values, String selection, String[] selectionArgs) {
+        if (values.size()==0){
+            return 0;
+        }
+        //TODO: Add Validation Logic
+        SQLiteDatabase db = stockDbHelper.getWritableDatabase();
+        return db.update(StockContract.SuppliersEntry.TABLE_NAME, values,selection,selectionArgs);
+    }
 }
