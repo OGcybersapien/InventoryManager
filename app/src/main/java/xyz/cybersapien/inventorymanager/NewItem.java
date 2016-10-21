@@ -11,10 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,14 +54,24 @@ public class NewItem extends AppCompatActivity implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        ArrayList<Supplier> suppliers = new ArrayList<>();
-        while (data.moveToNext()){
-            int nameIndex = data.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME);
-            int idIndex = data.getColumnIndex(StockContract.SuppliersEntry._ID);
-            suppliers.add(new Supplier(data.getString(nameIndex), data.getString(idIndex)));
-        }
-        SupplierSpinnerAdapter spinnerAdapter = new SupplierSpinnerAdapter(getBaseContext(), suppliers);
-        supplierSpinner.setAdapter(spinnerAdapter);
+        String[] fromCursor = new String[] {StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME};
+        int[] toResource = new int[] {android.R.id.text1};
+        SimpleCursorAdapter supplierAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, data,fromCursor, toResource, 0);
+        supplierSpinner.setAdapter(supplierAdapter);
+
+        supplierSpinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                        Toast.makeText(NewItem.this, "Id of the Item Selected: " + id, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        //Do Nothing!
+                    }
+                }
+        );
     }
 
     @Override
@@ -67,32 +80,4 @@ public class NewItem extends AppCompatActivity implements LoaderManager.LoaderCa
         supplierSpinner.setAdapter(null);
     }
 
-
-    private class Supplier{
-
-        public String name;
-        public String id;
-
-        public Supplier(String name, String id) {
-            this.id = id;
-            this.name = name;
-        }
-    }
-
-    private class SupplierSpinnerAdapter extends ArrayAdapter<Supplier>{
-
-        public SupplierSpinnerAdapter(Context context, List<Supplier> objects) {
-            super(context, android.R.layout.simple_spinner_dropdown_item, objects);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView = new TextView(getContext());
-            textView.setText(getItem(position).name);
-            return textView;
-        }
-
-
-    }
 }

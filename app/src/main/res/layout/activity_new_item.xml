@@ -89,12 +89,13 @@
             android:text="Supplier: "
             android:minEms="5"
             android:maxEms="5"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:layout_gravity="center_vertical" />
 
         <Spinner
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:id="@+id/suppliers_spinner">
 
         </Spinner>
