@@ -17,9 +17,17 @@
         </activity>
 
         <provider
-            android:authorities="xyz.cybersapien.inventorymanager"
             android:name=".data.StockProvider"
+            android:authorities="xyz.cybersapien.inventorymanager"
             android:exported="false" />
+
+        <activity android:name=".SupplierActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"
+                />
+        </activity>
     </application>
 
 </manifest>

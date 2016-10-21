@@ -21,17 +21,7 @@
         app:elevation="10dp"
         android:layout_gravity="bottom|end"
         app:fabSize="normal"
-        android:src="@drawable/ic_android_done"
-        android:layout_margin="15dp"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/floatingActionButton2"
-        app:elevation="10dp"
-        android:layout_gravity="bottom|start"
-        app:fabSize="normal"
-        android:src="@drawable/ic_android_done"
+        android:src="@drawable/ic_done"
         android:layout_margin="15dp"/>
 
 </android.support.design.widget.CoordinatorLayout>
