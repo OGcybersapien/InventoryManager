@@ -9,7 +9,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -84,7 +83,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
                 insertItems();
                 break;
             case R.id.action_menu_list_toggle:
-                Intent goToSupplier = new Intent(this,SupplierActivity.class);
+                Intent goToSupplier = new Intent(this,SupplierListActivity.class);
                 startActivity(goToSupplier);
                 break;
             case android.R.id.home:

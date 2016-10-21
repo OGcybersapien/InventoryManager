@@ -52,13 +52,10 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     private static final int ITEM_LOADER = 100;
     private static final int SUPPLIER_LOADER = 200;
 
-    /*Button for updating order*/
-    private Button orderButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_item);
+        setContentView(R.layout.activity_item_editor);
 
         data = getIntent().getData();
         newItem = data==null;
@@ -111,13 +108,23 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_editors, menu);
+        if (newItem){
+            menu.findItem(R.id.action_delete_this).setVisible(false);
+        }
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
+                finish();
+                break;
+            case R.id.action_delete_this:
+                String where = StockContract.ItemEntry._ID + "=?";
+                String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
+                getContentResolver().delete(StockContract.ItemEntry.ITEMS_CONTENT_URI, where,selectionArgs);
                 finish();
                 break;
         }
@@ -238,7 +245,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void initOrderButton(final Intent intent) {
-        orderButton = (Button) findViewById(R.id.order_button);
+        Button orderButton = (Button) findViewById(R.id.order_button);
         orderButton.setVisibility(View.VISIBLE);
         orderButton.setOnClickListener(new View.OnClickListener() {
             @Override

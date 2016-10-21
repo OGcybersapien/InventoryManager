@@ -18,9 +18,9 @@ import android.widget.ListView;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
-public class SupplierActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class SupplierListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    public static final String LOG_TAG = SupplierActivity.class.getName();
+    public static final String LOG_TAG = SupplierListActivity.class.getName();
 
     private static final int STOCK_LOADER = 0;
 
@@ -40,7 +40,8 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Implement add new supplier intent
+                Intent newSupplierIntent = new Intent(getBaseContext(), SupplierEditorActivity.class);
+                startActivity(newSupplierIntent);
             }
         });
 
@@ -71,7 +72,7 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
                 startActivity(itemsIntent);
                 break;
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(SupplierActivity.this);
+                NavUtils.navigateUpFromSameTask(SupplierListActivity.this);
                 break;
         }
         return true;

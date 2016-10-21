@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SupplierActivity"
+            android:name=".SupplierListActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -34,11 +34,20 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".ItemEditorActivity"
+        <activity
+            android:name=".ItemEditorActivity"
             android:parentActivityName=".ItemListActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ItemListActivity"/>
+                android:value=".ItemListActivity" />
+        </activity>
+        <activity android:name=".SupplierEditorActivity"
+            android:parentActivityName=".SupplierListActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SupplierListActivity"
+                />
         </activity>
     </application>
 
