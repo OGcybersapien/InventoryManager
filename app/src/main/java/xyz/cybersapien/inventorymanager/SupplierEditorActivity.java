@@ -96,7 +96,7 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        
     }
 
     private void setupFields(Cursor cursor) {

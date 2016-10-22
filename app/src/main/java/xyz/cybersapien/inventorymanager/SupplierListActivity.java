@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
@@ -28,7 +29,7 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
     private SupplierCursorAdapter customCursorAdapter;
 
     //ListView for the Adapter to display data
-    private ListView itemsListView;
+    private ListView suppliersListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +47,12 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
         });
 
         setTitle("Suppliers");
-        itemsListView = (ListView) findViewById(R.id.main_list);
+        suppliersListView = (ListView) findViewById(R.id.main_list);
+        TextView emptyHintView = (TextView) findViewById(R.id.empty_list_hint);
+        emptyHintView.setText("Nothing to show.\nAdd a Supplier to get started");
+        suppliersListView.setEmptyView(emptyHintView);
         customCursorAdapter = new SupplierCursorAdapter(this, null);
-        itemsListView.setAdapter(customCursorAdapter);
+        suppliersListView.setAdapter(customCursorAdapter);
 
         //start the Loader
         getLoaderManager().initLoader(STOCK_LOADER, null, this);
@@ -56,7 +60,7 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.list_menu, menu);
         menu.findItem(R.id.action_menu_list_toggle).setTitle("Items List");
         return true;
     }
@@ -70,6 +74,9 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
             case R.id.action_menu_list_toggle:
                 Intent itemsIntent = new Intent(this, ItemListActivity.class);
                 startActivity(itemsIntent);
+                break;
+            case R.id.delete_all:
+                getContentResolver().delete(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, null,null);
                 break;
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(SupplierListActivity.this);

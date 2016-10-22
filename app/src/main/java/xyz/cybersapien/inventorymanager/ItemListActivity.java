@@ -49,7 +49,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
         setTitle("Items in Stock");
         //get the empty ListView
         itemsListView = (ListView) findViewById(R.id.main_list);
-        TextView hintView = (TextView) findViewById(R.id.add_items_hint);
+        TextView hintView = (TextView) findViewById(R.id.empty_list_hint);
         hintView.setText("Nothing to show.\nStart by adding a supplier and then add Items.");
         itemsListView.setEmptyView(hintView);
         customCursorAdapter = new ItemCursorAdapter(this, null);
@@ -71,7 +71,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.list_menu, menu);
         menu.findItem(R.id.action_menu_list_toggle).setTitle("Supplier List");
         return true;
     }
@@ -86,6 +86,9 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
                 Intent goToSupplier = new Intent(this,SupplierListActivity.class);
                 startActivity(goToSupplier);
                 break;
+            case R.id.delete_all:
+                getContentResolver().delete(StockContract.ItemEntry.ITEMS_CONTENT_URI, null,null);
+                break;
             case android.R.id.home:
                 finish();
                 break;
@@ -97,7 +100,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
         ContentValues values = new ContentValues();
         values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, "Item");
         values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, 25.5);
-        values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, 2);
+        values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, 1);
         Uri itemsUri = StockContract.ItemEntry.ITEMS_CONTENT_URI;
         getContentResolver().insert(itemsUri, values);
     }

@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -39,6 +40,9 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
     /*Price Text Field*/
     private EditText priceEditText;
+
+    /*Image View*/
+    private ImageView itemImageView;
 
     /*Supplier ID*/
     private long supplierID;
