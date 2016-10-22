@@ -3,12 +3,16 @@ package xyz.cybersapien.inventorymanager.data;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by ogcybersapien on 19/10/16.
@@ -203,19 +207,62 @@ public class StockProvider extends ContentProvider {
         if (values.size() == 0){
             return 0;
         }
-        //TODO: Add Validation Logic
+        //Name Validation
+        if (values.containsKey(StockContract.ItemEntry.COLUMN_ITEM_NAME) && values.getAsString(StockContract.ItemEntry.COLUMN_ITEM_NAME) == null){
+            throw new IllegalArgumentException("Item requires a name");
+        }
+        //Price Validation
+        if (values.containsKey(StockContract.ItemEntry.COLUMN_ITEM_PRICE) && values.getAsDouble(StockContract.ItemEntry.COLUMN_ITEM_PRICE)==null){
+            throw new IllegalArgumentException("Item requires a price");
+        }
+        //Quantity Validation
+        if (values.containsKey(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY) && values.getAsInteger(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY)==null){
+            throw new IllegalArgumentException("Item requires a quantity");
+        }
+        //Supplier Validation
+        if (values.containsKey(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID) && values.getAsInteger(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID)==null){
+            throw new IllegalArgumentException("Item requires a valid Supplier");
+        }
+
         SQLiteDatabase db = stockDbHelper.getWritableDatabase();
         return db.update(StockContract.ItemEntry.TABLE_NAME,values,selection,selectionArgs);
     }
 
     private long addItem(ContentValues values){
-        //TODO: Create Validation Logic
+
+        String name = values.getAsString(StockContract.ItemEntry.COLUMN_ITEM_NAME);
+        if (TextUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Item requires a valid name");
+        }
+        Integer quantity = values.getAsInteger(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY);
+        if (quantity == null){
+            throw new IllegalArgumentException("Item requires a valid quantity");
+        }
+
+        Double price = values.getAsDouble(StockContract.ItemEntry.COLUMN_ITEM_PRICE);
+        if (price == null){
+            throw new IllegalArgumentException("Item requires a valid price");
+        }
+        Integer supplierId = values.getAsInteger(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID);
+        if (supplierId == null){
+            throw new IllegalArgumentException("Item requires a valid Supplier Id");
+        }
+
         SQLiteDatabase db = stockDbHelper.getWritableDatabase();
         return db.insert(StockContract.ItemEntry.TABLE_NAME,null,values);
     }
 
     private long addSupplier(ContentValues values){
-        //TODO: Create Validation Logic
+
+        String supplierName = values.getAsString(StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME);
+        if (TextUtils.isEmpty(supplierName)){
+            throw new IllegalArgumentException("Supplier requires a valid name");
+        }
+        String email = values.getAsString(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL);
+        String phone = values.getAsString(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE);
+        if (TextUtils.isEmpty(email) && TextUtils.isEmpty(phone)){
+            throw new IllegalArgumentException("Atleast one among email and string must be selected");
+        }
         SQLiteDatabase db = stockDbHelper.getWritableDatabase();
         return db.insert(StockContract.SuppliersEntry.TABLE_NAME, null,values);
     }
@@ -224,7 +271,17 @@ public class StockProvider extends ContentProvider {
         if (values.size()==0){
             return 0;
         }
-        //TODO: Add Validation Logic
+        //Name Validation
+        if (values.containsKey(StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME) && values.getAsString(StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME)==null){
+            throw new IllegalArgumentException("Supplier requires a name");
+        }
+        //Email and phone number, atleast one must exist
+        if (values.containsKey(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL)
+                && values.getAsString(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL)==null
+                && values.containsKey(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE)
+                && values.getAsString(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE)==null){
+            throw new IllegalArgumentException("Atleast one from email and phone number must exist");
+        }
         SQLiteDatabase db = stockDbHelper.getWritableDatabase();
         return db.update(StockContract.SuppliersEntry.TABLE_NAME, values,selection,selectionArgs);
     }

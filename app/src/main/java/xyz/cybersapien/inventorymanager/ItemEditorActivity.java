@@ -4,10 +4,14 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,7 +25,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
@@ -53,8 +66,13 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     /*Uri for the data in case this instance is to update an entry*/
     private Uri data;
 
+    /*Uri for the photo*/
+    private Uri itemPhotoUri;
+
     private static final int ITEM_LOADER = 100;
     private static final int SUPPLIER_LOADER = 200;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +81,9 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
         data = getIntent().getData();
         newItem = data==null;
+
+        //Initialize the ImageView
+        itemImageView = (ImageView) findViewById(R.id.item_image_view);
 
         //Initialize Spinner
         supplierSpinner = (Spinner) findViewById(R.id.suppliers_spinner);
@@ -82,9 +103,64 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
             submitButton.setText("Add Item");
         }
 
+
         Log.d(LOG_TAG, "In OnCreate");
 
-        findViewById(R.id.order_button).setVisibility(View.GONE);
+        initChangeImageButton();
+        initSubmitButton();
+    }
+
+    private void initChangeImageButton() {
+
+        Button changeImageButton = (Button) findViewById(R.id.take_image_button);
+        changeImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //Ensure that there is a camera
+                if (itemPhotoUri != null) {
+                    File file = new File(itemPhotoUri.getPath());
+                    if (file.exists()){
+                        file.delete();
+                    }
+                }
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null){
+                    File picture = null;
+                    try {
+                        picture = createImageFile();
+                    } catch (IOException e){
+                        Log.e(LOG_TAG, "Error getting photo");
+                    }
+                    if (picture != null){
+                        Uri photoURI = FileProvider.getUriForFile(getBaseContext(),"xyz.cybersapien.inventorymanager.fileprovider", picture);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
+            Picasso.with(this).load(itemPhotoUri).resize(itemImageView.getWidth(), itemImageView.getHeight()).into(itemImageView);
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String imageFileName = "JPEG_" + nameEditText.getText().toString();
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        itemPhotoUri = Uri.parse("file:" + image.getAbsolutePath());
+        return image;
+    }
+
+    private void initSubmitButton() {
+
+        Button submitButton = (Button) findViewById(R.id.submit_button);
+
+        submitButton.setVisibility(View.VISIBLE);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,6 +170,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, Integer.parseInt(quantityEditText.getText().toString()));
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, supplierID);
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
                     getContentResolver().insert(StockContract.ItemEntry.ITEMS_CONTENT_URI, values);
                     finish();
                 } else {
@@ -101,7 +178,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, nameEditText.getText().toString());
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, Integer.parseInt(quantityEditText.getText().toString()));
-
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
                     String where = StockContract.ItemEntry._ID + "=?";
                     String[] whereArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
                     getContentResolver().update(StockContract.ItemEntry.ITEMS_CONTENT_URI, values, where, whereArgs);
@@ -155,7 +232,8 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                         StockContract.ItemEntry.COLUMN_ITEM_NAME,
                         StockContract.ItemEntry.COLUMN_ITEM_PRICE,
                         StockContract.ItemEntry.COLUMN_ITEM_QUANTITY,
-                        StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID
+                        StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID,
+                        StockContract.ItemEntry.COLUMN_ITEM_PICTURE
                 };
                 Log.d(LOG_TAG, "In Item Loader onCreateLoader");
                 String selection = StockContract.ItemEntry._ID + "=?";
@@ -243,6 +321,11 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
             nameEditText.setText(name);
             quantityEditText.setText(quantity);
             priceEditText.setText(price);
+            String pictureEntry = cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_PICTURE));
+            if (!TextUtils.isEmpty(pictureEntry)) {
+                itemPhotoUri = Uri.parse(cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_PICTURE)));
+                Picasso.with(this).load(itemPhotoUri).resize(itemImageView.getWidth(), itemImageView.getHeight()).into(itemImageView);
+            }
         } else {
             Log.e(LOG_TAG, "setupFields: " + cursor.toString());
         }

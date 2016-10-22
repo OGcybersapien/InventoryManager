@@ -1,5 +1,6 @@
 package xyz.cybersapien.inventorymanager;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -53,6 +55,16 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
         suppliersListView.setEmptyView(emptyHintView);
         customCursorAdapter = new SupplierCursorAdapter(this, null);
         suppliersListView.setAdapter(customCursorAdapter);
+
+        suppliersListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Uri supplierUri = ContentUris.withAppendedId(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, id);
+                Intent intent = new Intent(getBaseContext(), SupplierEditorActivity.class);
+                intent.setData(supplierUri);
+                startActivity(intent);
+            }
+        });
 
         //start the Loader
         getLoaderManager().initLoader(STOCK_LOADER, null, this);

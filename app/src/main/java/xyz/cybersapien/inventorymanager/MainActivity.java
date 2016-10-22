@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(activityIntent);
                 break;
             case R.id.add_sale_option:
+                activityIntent = new Intent(this, SaleActivity.class);
+                startActivity(activityIntent);
                 break;
             default:
                 throw new NullPointerException("View case not found!");

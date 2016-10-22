@@ -50,7 +50,6 @@ public class SupplierCursorAdapter extends CursorAdapter {
         String name = cursor.getString(nameIndex);
         String phone = cursor.getString(phoneIndex);
         String email = cursor.getString(emailIndex);
-
         supplierNameView.setText(name);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){

@@ -2,6 +2,7 @@ package xyz.cybersapien.inventorymanager;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
@@ -11,6 +12,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -31,6 +34,9 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
     private EditText emailEditText;
     private EditText phoneEditText;
 
+    /*Supplier save button*/
+    private Button saveSupplier;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +51,8 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         if (!newSupplier){
             getLoaderManager().initLoader(1, null, this);
         }
+
+        initSaveButton();
     }
 
     @Override
@@ -71,6 +79,27 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
                 break;
         }
         return true;
+    }
+
+    private void initSaveButton() {
+        saveSupplier = (Button) findViewById(R.id.save_supplier_button);
+
+        saveSupplier.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ContentValues values = new ContentValues();
+                values.put(StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME, nameEditText.getText().toString());
+                values.put(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE, phoneEditText.getText().toString());
+                values.put(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL, emailEditText.getText().toString());
+                if (newSupplier){
+                    getContentResolver().insert(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, values);
+                } else {
+                    String selection = StockContract.SuppliersEntry._ID + "=?";
+                    String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
+                    getContentResolver().update(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, values, selection, selectionArgs);
+                }
+            }
+        });
     }
 
     @Override
