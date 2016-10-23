@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:id="@+id/item_list_item"
+    android:padding="5dp"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -74,4 +75,23 @@
             android:layout_below="@id/current_quantity_text_view"/>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/track_sale"
+            android:text="Track Sale"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/openEditor"
+            android:text="Edit"/>
+
+    </LinearLayout>
 </LinearLayout>

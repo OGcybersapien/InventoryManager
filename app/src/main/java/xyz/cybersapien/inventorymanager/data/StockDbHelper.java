@@ -28,7 +28,8 @@ public class StockDbHelper extends SQLiteOpenHelper {
                 + ItemEntry.COLUMN_ITEM_PRICE + " REAL NOT NULL DEFAULT 0, "
                 + ItemEntry.COLUMN_ITEM_QUANTITY + " INTEGER NOT NULL DEFAULT 0, "
                 + ItemEntry.COLUMN_ITEM_SUPPLIER_ID + " INTEGER NOT NULL, "
-                + ItemEntry.COLUMN_ITEM_SALES + " INTEGER NOT NULL DEFAULT 0, "
+                + ItemEntry.COLUMN_ITEM_SUPPLIER_EMAIL + " TEXT, "
+                + ItemEntry.COLUMN_ITEM_SUPPLIER_PHONE + " TEXT, "
                 + ItemEntry.COLUMN_ITEM_PICTURE + " TEXT);";
 
         db.execSQL(SQL_CREATE_ITEMS_TABLE);

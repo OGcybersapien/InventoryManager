@@ -36,9 +36,6 @@ import java.io.IOException;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
-import static xyz.cybersapien.inventorymanager.R.string.email;
-import static xyz.cybersapien.inventorymanager.R.string.phone;
-
 public class ItemEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private String LOG_TAG = ItemEditorActivity.class.getName();
@@ -73,6 +70,12 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
     /*Supplier Cursor*/
     private Cursor supplierCursor;
+
+    /*Supplier Email*/
+    private String supplierEmail;
+
+    /*Supplier Phone*/
+    private String supplierPhone;
 
     private static final int ITEM_LOADER = 100;
     private static final int SUPPLIER_LOADER = 200;
@@ -179,11 +182,20 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                 if (newItem){
                     ContentValues values = new ContentValues();
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, nameEditText.getText().toString());
-                    values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
+                    String priceString = priceEditText.getText().toString();
+                    if (!TextUtils.isEmpty(priceString)){
+                        values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceString));
+                    } else {
+                        values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, "-1");
+                    }
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, supplierID);
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_PHONE, supplierPhone);
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_EMAIL, supplierEmail);
                     if (itemPhotoUri!=null) {
                         values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
+                    } else {
+                        values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, "");
                     }
                     if (validation(values)){
                         getContentResolver().insert(StockContract.ItemEntry.ITEMS_CONTENT_URI, values);
@@ -196,8 +208,13 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, nameEditText.getText().toString());
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, supplierID);
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_EMAIL, supplierEmail);
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_PHONE, supplierPhone);
                     if (itemPhotoUri != null) {
                         values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
+                    } else {
+                        values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, "");
                     }
                     if (validation(values)){
                         String where = StockContract.ItemEntry._ID + "=?";
@@ -269,7 +286,9 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                         StockContract.ItemEntry.COLUMN_ITEM_PRICE,
                         StockContract.ItemEntry.COLUMN_ITEM_QUANTITY,
                         StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID,
-                        StockContract.ItemEntry.COLUMN_ITEM_PICTURE
+                        StockContract.ItemEntry.COLUMN_ITEM_PICTURE,
+                        StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_EMAIL,
+                        StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_PHONE
                 };
                 String selection = StockContract.ItemEntry._ID + "=?";
                 String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
@@ -329,26 +348,24 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
             if(cursor.moveToPosition(position)){
                 int emailIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL);
                 int phoneIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE);
-                String email = null;
                 if (emailIndex!=-1) {
-                    email = cursor.getString(emailIndex);
+                    supplierEmail = cursor.getString(emailIndex);
                 }
-                String phone = null;
                 if (phoneIndex!=-1) {
-                    phone = cursor.getString(phoneIndex);
+                    supplierPhone = cursor.getString(phoneIndex);
                 }
                 Intent intent;
                 if (!newItem){
-                    if (!TextUtils.isEmpty(email)){
+                    if (!TextUtils.isEmpty(supplierEmail)){
                         intent = new Intent(Intent.ACTION_SENDTO);
-                        intent.setData(Uri.parse("mailto:" + email.trim()));
+                        intent.setData(Uri.parse("mailto:" + supplierEmail.trim()));
                         if (intent.resolveActivity(this.getPackageManager())!=null){
                             initOrderButton(intent);
                         } else{
                             Toast.makeText(this, "No Application to send Email!", Toast.LENGTH_SHORT).show();
                         }
-                    } else if (!TextUtils.isEmpty(phone)){
-                        intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone.trim()));
+                    } else if (!TextUtils.isEmpty(supplierPhone)){
+                        intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + supplierPhone.trim()));
                         if (intent.resolveActivity(this.getPackageManager())!=null) {
                             initOrderButton(intent);
                         } else {

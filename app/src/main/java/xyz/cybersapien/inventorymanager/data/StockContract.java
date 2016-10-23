@@ -36,7 +36,8 @@ public final class StockContract {
         public static final String COLUMN_ITEM_PRICE = "price";
         public static final String COLUMN_ITEM_SUPPLIER_ID = "supId";
         public static final String COLUMN_ITEM_PICTURE = "picture";
-        public static final String COLUMN_ITEM_SALES = "sale";
+        public static final String COLUMN_ITEM_SUPPLIER_EMAIL = "email";
+        public static final String COLUMN_ITEM_SUPPLIER_PHONE = "phone";
 
 
         /*MIME types for different Content URIs*/
