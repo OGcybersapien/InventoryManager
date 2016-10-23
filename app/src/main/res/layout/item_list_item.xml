@@ -76,22 +76,12 @@
 
     </RelativeLayout>
 
-    <LinearLayout
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:id="@+id/track_sale"
+        android:focusable="false"
+        android:layout_gravity="center"
+        android:text="Track Sale"/>
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/track_sale"
-            android:text="Track Sale"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/openEditor"
-            android:text="Edit"/>
-
-    </LinearLayout>
 </LinearLayout>

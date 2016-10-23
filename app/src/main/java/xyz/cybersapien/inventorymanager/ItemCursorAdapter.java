@@ -1,6 +1,7 @@
 package xyz.cybersapien.inventorymanager;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -25,7 +26,6 @@ import xyz.cybersapien.inventorymanager.data.StockContract;
  */
 
 public class ItemCursorAdapter extends CursorAdapter {
-
 
     public ItemCursorAdapter(Context context, Cursor c) {
         super(context, c, 0 /*flags*/);
@@ -56,51 +56,32 @@ public class ItemCursorAdapter extends CursorAdapter {
 
         //Get values for the fields
         String itemName = cursor.getString(nameIndex);
+        final Long id = cursor.getLong(idIndex);
         Float price = cursor.getFloat(priceIndex);
-        Integer quantity = cursor.getInt(quantityIndex);
+        final Integer quantity = cursor.getInt(quantityIndex);
         if (imageIndex>-1){
             String image = cursor.getString(imageIndex);
             if (!TextUtils.isEmpty(image))
             Picasso.with(context).load(Uri.parse(image)).resize(250,350).into(item_image_view);
         }
 
-        final String supplierEmail = cursor.getString(emailIndex);
-        final String supplierPhone = cursor.getString(phoneIndex);
-
         //Set values to the respective TextViews
         item_name_view.setText(itemName);
         item_price_view.setText(NumberFormat.getCurrencyInstance().format(price));
         item_quantity_view.setText(NumberFormat.getInstance().format(quantity));
-
         view.findViewById(R.id.track_sale).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!TextUtils.isEmpty(supplierEmail)){
-                    Intent intent = new Intent(Intent.ACTION_SENDTO);
-                    intent.setData(Uri.parse("mailto:" + supplierEmail.trim()));
-                    if (intent.resolveActivity(context.getPackageManager())!=null){
-                        context.startActivity(intent);
-                    } else{
-                        Toast.makeText(context, "No Application to send Email!", Toast.LENGTH_SHORT).show();
-                    }
-                } else if (!TextUtils.isEmpty(supplierPhone)){
-                    Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + supplierPhone.trim()));
-                    if (intent.resolveActivity(context.getPackageManager())!=null){
-                        context.startActivity(intent);
-                    }
+                if (quantity>0){
+                    Integer quantity2 = quantity - 1;
+                    ContentValues values = new ContentValues();
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity2);
+                    String selection = StockContract.ItemEntry._ID + "=?";
+                    String[] selectionArgs = new String[] {String.valueOf(id)};
+                    context.getContentResolver().update(StockContract.ItemEntry.ITEMS_CONTENT_URI, values, selection, selectionArgs);
                 } else {
-                    Toast.makeText(context, "No Application to make a call!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Error! Item Not in Stock!", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-
-        view.findViewById(R.id.openEditor).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Uri itemUri = ContentUris.withAppendedId(StockContract.ItemEntry.ITEMS_CONTENT_URI,cursor.getLong(idIndex));
-                Intent intent = new Intent(context, ItemEditorActivity.class);
-                intent.setData(itemUri);
-                context.startActivity(intent);
             }
         });
     }

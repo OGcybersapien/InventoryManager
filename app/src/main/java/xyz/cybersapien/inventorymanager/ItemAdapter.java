@@ -38,6 +38,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
         TextView priceView = (TextView) listView.findViewById(R.id.price_text_view);
         priceView.setText(String.valueOf(currentItem.getPrice()));
 
+        listView.findViewById(R.id.track_sale).setVisibility(View.GONE);
 
         return listView;
     }
