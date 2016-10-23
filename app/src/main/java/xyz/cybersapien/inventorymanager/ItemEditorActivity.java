@@ -36,6 +36,9 @@ import java.io.IOException;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
+import static xyz.cybersapien.inventorymanager.R.string.email;
+import static xyz.cybersapien.inventorymanager.R.string.phone;
+
 public class ItemEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private String LOG_TAG = ItemEditorActivity.class.getName();
@@ -67,6 +70,9 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
     /*Uri for the photo*/
     private Uri itemPhotoUri;
+
+    /*Supplier Cursor*/
+    private Cursor supplierCursor;
 
     private static final int ITEM_LOADER = 100;
     private static final int SUPPLIER_LOADER = 200;
@@ -176,21 +182,49 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, supplierID);
-                    values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
-                    getContentResolver().insert(StockContract.ItemEntry.ITEMS_CONTENT_URI, values);
-                    finish();
+                    if (itemPhotoUri!=null) {
+                        values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
+                    }
+                    if (validation(values)){
+                        getContentResolver().insert(StockContract.ItemEntry.ITEMS_CONTENT_URI, values);
+                        getLoaderManager().destroyLoader(ITEM_LOADER);
+                        getLoaderManager().destroyLoader(SUPPLIER_LOADER);
+                        finish();
+                    }
                 } else {
                     ContentValues values = new ContentValues();
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, nameEditText.getText().toString());
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
-                    values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
-                    String where = StockContract.ItemEntry._ID + "=?";
-                    String[] whereArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
-                    getContentResolver().update(StockContract.ItemEntry.ITEMS_CONTENT_URI, values, where, whereArgs);
+                    if (itemPhotoUri != null) {
+                        values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
+                    }
+                    if (validation(values)){
+                        String where = StockContract.ItemEntry._ID + "=?";
+                        String[] whereArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
+                        getContentResolver().update(StockContract.ItemEntry.ITEMS_CONTENT_URI, values, where, whereArgs);
+                        getLoaderManager().destroyLoader(ITEM_LOADER);
+                        getLoaderManager().destroyLoader(SUPPLIER_LOADER);
+                        finish();
+                    }
                 }
             }
         });
+    }
+
+    private boolean validation(ContentValues values){
+        boolean isValid = true;
+        String name = values.getAsString(StockContract.ItemEntry.COLUMN_ITEM_NAME);
+        if (TextUtils.isEmpty(name)){
+            nameEditText.setError("Name is required!");
+            isValid = false;
+        }
+        Double price = values.getAsDouble(StockContract.ItemEntry.COLUMN_ITEM_PRICE);
+        if (price == null || price.isNaN() || price<0){
+            priceEditText.setError("Price is invalid!");
+            isValid = false;
+        }
+        return isValid;
     }
 
     @Override
@@ -249,8 +283,8 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         switch (loader.getId()){
             case SUPPLIER_LOADER:
+                supplierCursor = cursor;
                 setupSpinner(cursor);
-                setupSupplierData(cursor);
                 break;
             case ITEM_LOADER:
                 setupFields(cursor);
@@ -264,46 +298,65 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
         supplierSpinner.setAdapter(null);
     }
 
-    private void setupSpinner(final Cursor supplierCursor){
-        String[] fromCursor = new String[] {StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME};
-        int[] toResource = new int[] {android.R.id.text1};
-        SimpleCursorAdapter supplierAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, supplierCursor,fromCursor, toResource, 0);
-        supplierSpinner.setAdapter(supplierAdapter);
+    private void setupSpinner(final Cursor cursor){
+        if (cursor.getCount()!=0){
+            String[] fromCursor = new String[] {StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME};
+            int[] toResource = new int[] {android.R.id.text1};
+            SimpleCursorAdapter supplierAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, cursor,fromCursor, toResource, 0);
+            supplierSpinner.setAdapter(supplierAdapter);
+            supplierSpinner.setOnItemSelectedListener(
+                    new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                            supplierID = id;
+                            setupSupplierData(position);
+                        }
 
-        supplierSpinner.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                        supplierID = id;
-                        setupSupplierData(supplierCursor);
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+                            if (!newItem){
+                                supplierSpinner.setSelection(getPosition(cursor));
+                            }
+                        }
                     }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-                        //Do Nothing!
-                    }
-                }
-        );
+            );
+        }
     }
 
-    private void setupSupplierData(Cursor cursor){
-        if(!(cursor.getCount()==0)){
-            int emailIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL);
-            int phoneIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE);
-
-            String email = cursor.getString(emailIndex);
-            String phone = cursor.getString(phoneIndex);
-            Intent intent;
-            if (!newItem){
-                if (!TextUtils.isEmpty(email)){
-                    intent = new Intent(Intent.ACTION_SENDTO);
-                    intent.setData(Uri.parse("mailto:" + email.trim()));
-                    initOrderButton(intent);
-                } else if (!TextUtils.isEmpty(phone)){
-                    intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone.trim()));
-                    initOrderButton(intent);
-                } else {
-                    Toast.makeText(this, R.string.no_contact_info_error, Toast.LENGTH_SHORT).show();
+    private void setupSupplierData(Integer position){
+        Cursor cursor = supplierCursor;
+        if (cursor!=null){
+            if(cursor.moveToPosition(position)){
+                int emailIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL);
+                int phoneIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE);
+                String email = null;
+                if (emailIndex!=-1) {
+                    email = cursor.getString(emailIndex);
+                }
+                String phone = null;
+                if (phoneIndex!=-1) {
+                    phone = cursor.getString(phoneIndex);
+                }
+                Intent intent;
+                if (!newItem){
+                    if (!TextUtils.isEmpty(email)){
+                        intent = new Intent(Intent.ACTION_SENDTO);
+                        intent.setData(Uri.parse("mailto:" + email.trim()));
+                        if (intent.resolveActivity(this.getPackageManager())!=null){
+                            initOrderButton(intent);
+                        } else{
+                            Toast.makeText(this, "No Application to send Email!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else if (!TextUtils.isEmpty(phone)){
+                        intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone.trim()));
+                        if (intent.resolveActivity(this.getPackageManager())!=null) {
+                            initOrderButton(intent);
+                        } else {
+                            Toast.makeText(this, "No Application found to make a call", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, R.string.no_contact_info_error, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
@@ -315,10 +368,11 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
             String name = cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_NAME));
             String quantity = cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY));
             String price = cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_PRICE));
-            Integer supplierID = cursor.getInt(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID));
-            supplierSpinner.setSelection(supplierID);
+            supplierID = cursor.getInt(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID));
             nameEditText.setText(name);
             this.quantity = Integer.parseInt(quantity);
+            setupSupplierData(getPosition(cursor));
+            cursor.moveToFirst();
             quantityTextView.setText(quantity);
             priceEditText.setText(price);
             String pictureEntry = cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_PICTURE));
@@ -329,6 +383,17 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
         } else {
             Log.e(LOG_TAG, "setupFields: " + cursor.toString());
         }
+    }
+
+    private int getPosition(Cursor c){
+        int currentPosition = 0;
+        while (c.moveToNext()){
+            if (c.getInt(c.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID)) == supplierID){
+                break;
+            }
+            currentPosition++;
+        }
+        return currentPosition;
     }
 
     private void initOrderButton(final Intent intent) {

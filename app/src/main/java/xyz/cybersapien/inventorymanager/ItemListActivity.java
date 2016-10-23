@@ -111,7 +111,8 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
                 StockContract.ItemEntry.COLUMN_ITEM_NAME,
                 StockContract.ItemEntry.COLUMN_ITEM_QUANTITY,
                 StockContract.ItemEntry.COLUMN_ITEM_PRICE,
-                StockContract.ItemEntry.COLUMN_ITEM_PICTURE
+                StockContract.ItemEntry.COLUMN_ITEM_PICTURE,
+                StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID
         };
 
         return new CursorLoader(this, StockContract.ItemEntry.ITEMS_CONTENT_URI,

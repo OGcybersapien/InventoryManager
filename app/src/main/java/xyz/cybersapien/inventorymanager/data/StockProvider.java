@@ -19,7 +19,7 @@ import android.util.Log;
 public class StockProvider extends ContentProvider {
 
     /*LOG TAG*/
-    private static final String LOG_TAG = StockProvider.class.getName();
+    public static final String LOG_TAG = StockProvider.class.getName();
 
     /*Database Helper Object*/
     private StockDbHelper stockDbHelper;

@@ -77,6 +77,11 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
 
     private void initSaveButton() {
         Button saveSupplier = (Button) findViewById(R.id.save_supplier_button);
+        if (newSupplier){
+            saveSupplier.setText("Add Supplier");
+        } else {
+            saveSupplier.setText("Update Supplier");
+        }
 
         saveSupplier.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,10 +92,12 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
                 values.put(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL, emailEditText.getText().toString());
                 if (newSupplier){
                     getContentResolver().insert(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, values);
+                    finish();
                 } else {
                     String selection = StockContract.SuppliersEntry._ID + "=?";
                     String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
                     getContentResolver().update(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, values, selection, selectionArgs);
+                    finish();
                 }
             }
         });

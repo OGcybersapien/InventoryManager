@@ -52,7 +52,7 @@
                 android:text="@string/quantity"
                 android:minEms="5"
                 android:maxEms="5"
-                android:textSize="16sp"/>
+                android:textSize="18sp"/>
 
 
             <ImageView
@@ -62,11 +62,11 @@
                 android:id="@+id/modifier_remove"/>
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:textSize="18sp"
                 android:id="@+id/item_quantity_text_view"/>
             <ImageView
                 android:layout_width="wrap_content"

@@ -61,6 +61,5 @@ public class ItemCursorAdapter extends CursorAdapter {
         item_name_view.setText(itemName);
         item_price_view.setText(NumberFormat.getCurrencyInstance().format(price));
         item_quantity_view.setText(NumberFormat.getInstance().format(quantity));
-
     }
 }
