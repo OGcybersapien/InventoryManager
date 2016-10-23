@@ -10,11 +10,8 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.squareup.picasso.Picasso;
-
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 

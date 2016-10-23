@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="@dimen/main_activity_list_height"
-        android:text="Items List"
+        android:text="@string/items_list"
         style="@style/MainActivityListStyle"
         android:id="@+id/items_list_option"
         android:onClick="onClickListener"
@@ -21,7 +21,7 @@
         android:layout_height="@dimen/main_activity_list_height"
         style="@style/MainActivityListStyle"
         android:id="@+id/suppliers_list_option"
-        android:text="Suppliers List"
+        android:text="@string/suppliers_list"
         android:onClick="onClickListener"
         android:background="@color/colorSuppliers"
         />
@@ -31,7 +31,7 @@
         android:layout_height="@dimen/main_activity_list_height"
         style="@style/MainActivityListStyle"
         android:id="@+id/add_sale_option"
-        android:text="New Sales"
+        android:text="@string/new_sales"
         android:onClick="onClickListener"
         android:background="@color/colorSales"/>
 
@@ -40,7 +40,7 @@
         android:layout_height="@dimen/main_activity_list_height"
         style="@style/MainActivityListStyle"
         android:id="@+id/add_purchase_option"
-        android:text="New Purchase"
+        android:text="@string/new_purchase"
         android:onClick="onClickListener"
         android:background="@color/colorPurchase"/>
 

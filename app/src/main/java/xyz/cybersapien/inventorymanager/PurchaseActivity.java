@@ -31,9 +31,6 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
     /*List of Items*/
     private ArrayList<Item> itemsList;
 
-    /*ListView to display Items*/
-    private ListView itemsView;
-
     /*currently selected item's ID*/
     private Integer currentSelected;
 
@@ -48,7 +45,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
         setContentView(R.layout.activity_perform_action);
 
         itemsList = new ArrayList<>();
-        itemsView = (ListView) findViewById(R.id.action_items_list);
+        ListView itemsView = (ListView) findViewById(R.id.action_items_list);
 
         adapter = new ItemAdapter(this,itemsList);
         itemsView.setAdapter(adapter);
@@ -67,7 +64,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
         getLoaderManager().initLoader(ITEM_LOADER, null, this);
 
         Button performPurchaseButton = (Button) findViewById(R.id.perform_action_button);
-        performPurchaseButton.setText("Purchase");
+        performPurchaseButton.setText(R.string.purchase);
         performPurchaseButton.setOnClickListener(purchaseButtonListener);
     }
 
@@ -145,7 +142,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            Toast.makeText(PurchaseActivity.this, "Purchase Successful!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PurchaseActivity.this, R.string.purchase_successful, Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -155,7 +152,7 @@ public class PurchaseActivity extends AppCompatActivity implements LoaderManager
         public void onClick(View view) {
             if (itemsList.isEmpty()){
                 //Show error
-                Toast.makeText(getBaseContext(), "Error! Can't make purchase with no items!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.purchase_error, Toast.LENGTH_SHORT).show();
                 return;
             }
             MakePurchaseASyncTask purchaseASyncTask = new MakePurchaseASyncTask();

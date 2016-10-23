@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.Image;
 import android.net.Uri;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -106,9 +105,9 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
         if (!newItem){
             getLoaderManager().initLoader(ITEM_LOADER,null,this);
-            submitButton.setText("Update");
+            submitButton.setText(R.string.update);
         } else {
-            submitButton.setText("Add Item");
+            submitButton.setText(R.string.add_item);
         }
 
         Log.d(LOG_TAG, "In OnCreate");
@@ -226,7 +225,6 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                         StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL,
                         StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE
                 };
-                Log.d(LOG_TAG, "In Supplier Loader onCreateLoader");
                 return  new CursorLoader(this, StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, supplierProjections,
                         null, null,null);
 
@@ -239,7 +237,6 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                         StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID,
                         StockContract.ItemEntry.COLUMN_ITEM_PICTURE
                 };
-                Log.d(LOG_TAG, "In Item Loader onCreateLoader");
                 String selection = StockContract.ItemEntry._ID + "=?";
                 String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
                 return new CursorLoader(this, StockContract.ItemEntry.ITEMS_CONTENT_URI, itemProjections, selection, selectionArgs, null);
@@ -306,7 +303,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phone.trim()));
                     initOrderButton(intent);
                 } else {
-                    Toast.makeText(this, "No Contact info found!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.no_contact_info_error, Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -356,8 +353,12 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     private View.OnClickListener decQuantity = new View.OnClickListener(){
         @Override
         public void onClick(View view) {
-            quantity--;
-            quantityTextView.setText(String.valueOf(quantity));
+            if (quantity>0){
+                quantity--;
+                quantityTextView.setText(String.valueOf(quantity));
+            } else {
+                Toast.makeText(ItemEditorActivity.this, R.string.error_negative_quantity, Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -368,15 +369,15 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
 
-        alertBuilder.setMessage("Delete this Item?");
-        alertBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+        alertBuilder.setMessage(R.string.delete_item);
+        alertBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 deleteItem();
             }
         });
 
-        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alertBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (dialogInterface != null){

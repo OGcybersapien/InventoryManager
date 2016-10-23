@@ -31,9 +31,6 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
     /*List of Items*/
     private ArrayList<Item> itemsList;
 
-    /*ListView to display Items*/
-    private ListView itemsView;
-
     /*currently selected item's ID*/
     private Integer currentSelected;
 
@@ -48,7 +45,7 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_perform_action);
 
         itemsList = new ArrayList<>();
-        itemsView = (ListView) findViewById(R.id.action_items_list);
+        ListView itemsView = (ListView) findViewById(R.id.action_items_list);
 
         adapter = new ItemAdapter(this,itemsList);
         itemsView.setAdapter(adapter);
@@ -67,7 +64,7 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
         getLoaderManager().initLoader(ITEM_LOADER, null, this);
 
         Button performSaleButton = (Button) findViewById(R.id.perform_action_button);
-        performSaleButton.setText("Make Sale");
+        performSaleButton.setText(R.string.make_sale);
         performSaleButton.setOnClickListener(saleButtonListener);
     }
 
@@ -119,8 +116,12 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
         int nameIndex = itemsCursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_NAME);
         int priceIndex = itemsCursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_PRICE);
         int quantityIndex = itemsCursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY);
-        itemsList.add(new Item(itemsCursor.getLong(idIndex),itemsCursor.getString(nameIndex), itemsCursor.getInt(quantityIndex), itemsCursor.getDouble(priceIndex)));
-        adapter.notifyDataSetChanged();
+        if (itemsCursor.getInt(quantityIndex)>0){
+            itemsList.add(new Item(itemsCursor.getLong(idIndex),itemsCursor.getString(nameIndex), itemsCursor.getInt(quantityIndex), itemsCursor.getDouble(priceIndex)));
+            adapter.notifyDataSetChanged();
+        } else {
+            Toast.makeText(this, R.string.zero_quantity, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -145,7 +146,7 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            Toast.makeText(SaleActivity.this, "Sale Successful!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SaleActivity.this, R.string.sale_successful, Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -155,7 +156,7 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
         public void onClick(View view) {
             if (itemsList.isEmpty()){
                 //Show error
-                Toast.makeText(getBaseContext(), "Error! Can't make sale with no items!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), R.string.error_sale, Toast.LENGTH_SHORT).show();
                 return;
             }
             MakeSaleASyncTask saleASyncTask = new MakeSaleASyncTask();

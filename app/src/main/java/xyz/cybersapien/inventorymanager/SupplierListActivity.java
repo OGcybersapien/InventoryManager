@@ -48,10 +48,10 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
             }
         });
 
-        setTitle("Suppliers");
+        setTitle(getString(R.string.suppliers));
         suppliersListView = (ListView) findViewById(R.id.main_list);
         TextView emptyHintView = (TextView) findViewById(R.id.empty_list_hint);
-        emptyHintView.setText("Nothing to show.\nAdd a Supplier to get started");
+        emptyHintView.setText(R.string.no_suppliers_hint);
         suppliersListView.setEmptyView(emptyHintView);
         customCursorAdapter = new SupplierCursorAdapter(this, null);
         suppliersListView.setAdapter(customCursorAdapter);
@@ -73,7 +73,7 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.list_menu, menu);
-        menu.findItem(R.id.action_menu_list_toggle).setTitle("Items List");
+        menu.findItem(R.id.action_menu_list_toggle).setTitle(R.string.items_list);
         return true;
     }
 
@@ -98,6 +98,7 @@ public class SupplierListActivity extends AppCompatActivity implements LoaderMan
     }
 
     private void insertSuppliers(){
+        //Dummy data
         ContentValues values = new ContentValues();
         values.put(StockContract.SuppliersEntry.COLUMN_SUPPLIER_NAME, "Charlie Harper");
         values.put(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE, "7696497298");

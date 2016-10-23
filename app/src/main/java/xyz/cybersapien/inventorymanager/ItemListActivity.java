@@ -29,9 +29,6 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
     //CursorAdapter for the Items and Suppliers
     private ItemCursorAdapter customCursorAdapter;
 
-    //ListView for the Adapter to display data
-    private ListView itemsListView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +43,11 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
             }
         });
 
-        setTitle("Items in Stock");
+        setTitle(getString(R.string.items_in_stock));
         //get the empty ListView
-        itemsListView = (ListView) findViewById(R.id.main_list);
+        ListView itemsListView = (ListView) findViewById(R.id.main_list);
         TextView hintView = (TextView) findViewById(R.id.empty_list_hint);
-        hintView.setText("Nothing to show.\nStart by adding a supplier and then add Items.");
+        hintView.setText(R.string.no_items_hint);
         itemsListView.setEmptyView(hintView);
         customCursorAdapter = new ItemCursorAdapter(this, null);
         itemsListView.setAdapter(customCursorAdapter);
@@ -72,7 +69,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.list_menu, menu);
-        menu.findItem(R.id.action_menu_list_toggle).setTitle("Supplier List");
+        menu.findItem(R.id.action_menu_list_toggle).setTitle(R.string.suppliers_list);
         return true;
     }
 
@@ -97,6 +94,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void insertItems(){
+        //Dummy data
         ContentValues values = new ContentValues();
         values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, "Item");
         values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, 2);

@@ -35,9 +35,6 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
     private EditText emailEditText;
     private EditText phoneEditText;
 
-    /*Supplier save button*/
-    private Button saveSupplier;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +76,7 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
     }
 
     private void initSaveButton() {
-        saveSupplier = (Button) findViewById(R.id.save_supplier_button);
+        Button saveSupplier = (Button) findViewById(R.id.save_supplier_button);
 
         saveSupplier.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,16 +141,16 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         //and click listeners for the positive and negative buttons
 
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setTitle("Delete this Supplier?");
-        alertBuilder.setMessage("Warning! this may cause problems with Items from this Supplier!");
-        alertBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+        alertBuilder.setTitle(R.string.delete_supplier_title);
+        alertBuilder.setMessage(R.string.delete_message_supplier);
+        alertBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 deleteSupplier();
             }
         });
 
-        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alertBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (dialogInterface != null){
