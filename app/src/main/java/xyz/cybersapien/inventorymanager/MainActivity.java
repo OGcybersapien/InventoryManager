@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
                 activityIntent = new Intent(this, SaleActivity.class);
                 startActivity(activityIntent);
                 break;
+            case R.id.add_purchase_option:
+                activityIntent = new Intent(this, PurchaseActivity.class);
             default:
                 throw new NullPointerException("View case not found!");
         }

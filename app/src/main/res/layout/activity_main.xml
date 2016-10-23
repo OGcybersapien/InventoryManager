@@ -35,5 +35,13 @@
         android:onClick="onClickListener"
         android:background="@color/colorSales"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/main_activity_list_height"
+        style="@style/MainActivityListStyle"
+        android:id="@+id/add_purchase_option"
+        android:text="New Purchase"
+        android:onClick="onClickListener"
+        android:background="@color/colorPurchase"/>
 
 </LinearLayout>

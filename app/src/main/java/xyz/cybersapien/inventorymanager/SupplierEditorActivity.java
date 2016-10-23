@@ -4,9 +4,11 @@ import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
@@ -71,11 +72,7 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
                 finish();
                 break;
             case R.id.action_delete_this:
-                String where = StockContract.SuppliersEntry._ID + "=?";
-                String[] selectionArgs = new String[] {
-                        String.valueOf(ContentUris.parseId(data))};
-                getContentResolver().delete(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, where, selectionArgs);
-                finish();
+                showDeleteConfirmationDialog();
                 break;
         }
         return true;
@@ -139,5 +136,41 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         } else {
             Log.e(LOG_TAG, "Error!");
         }
+    }
+
+    private void showDeleteConfirmationDialog(){
+
+        //Create an AlertDialog and set the message,
+        //and click listeners for the positive and negative buttons
+
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setTitle("Delete this Supplier?");
+        alertBuilder.setMessage("Warning! this may cause problems with Items from this Supplier!");
+        alertBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteSupplier();
+            }
+        });
+
+        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null){
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        AlertDialog deleteAlert = alertBuilder.create();
+        deleteAlert.show();
+    }
+
+    private void deleteSupplier(){
+        String where = StockContract.SuppliersEntry._ID + "=?";
+        String[] selectionArgs = new String[] {
+                String.valueOf(ContentUris.parseId(data))};
+        getContentResolver().delete(StockContract.SuppliersEntry.SUPPLIERS_CONTENT_URI, where, selectionArgs);
+        finish();
     }
 }

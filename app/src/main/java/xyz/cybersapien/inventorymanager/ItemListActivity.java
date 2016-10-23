@@ -99,6 +99,7 @@ public class ItemListActivity extends AppCompatActivity implements LoaderManager
     private void insertItems(){
         ContentValues values = new ContentValues();
         values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, "Item");
+        values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, 2);
         values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, 25.5);
         values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, 1);
         Uri itemsUri = StockContract.ItemEntry.ITEMS_CONTENT_URI;

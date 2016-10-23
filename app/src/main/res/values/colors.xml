@@ -7,7 +7,7 @@
 
     <!-- Colors for different activities in the app-->
     <color name="colorItems">#4CAF50</color>
-    <color name="colorMall">#536DFE</color>
+    <color name="colorPurchase">#536DFE</color>
     <color name="colorSales">#607D8B</color>
     <color name="colorSuppliers">#FF9800</color>
 

@@ -53,14 +53,24 @@
                 android:maxEms="5"
                 android:textSize="16sp"/>
 
-            <EditText
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_angle_left"
+                android:id="@+id/modifier_remove"/>
+
+            <TextView
                 android:layout_width="0dp"
                 android:paddingLeft="10dp"
                 android:layout_weight="1"
-                android:inputType="number"
-                android:hint="Quantity"
                 android:layout_height="wrap_content"
-                android:id="@+id/item_quantity_edit_text"/>
+                android:id="@+id/item_quantity_text_view"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_angle_right"
+                android:id="@+id/modifier_add"/>
 
         </LinearLayout>
 

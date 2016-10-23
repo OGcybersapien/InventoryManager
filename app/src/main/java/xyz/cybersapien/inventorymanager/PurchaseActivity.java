@@ -21,9 +21,9 @@ import java.util.ArrayList;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
-public class SaleActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class PurchaseActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static String LOG_TAG = SaleActivity.class.getName();
+    private final static String LOG_TAG = PurchaseActivity.class.getName();
 
     /*Spinner for selecting the supplier*/
     private Spinner itemsSpinner;
@@ -66,9 +66,9 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
         itemsSpinner = (Spinner) findViewById(R.id.items_spinner);
         getLoaderManager().initLoader(ITEM_LOADER, null, this);
 
-        Button performSaleButton = (Button) findViewById(R.id.perform_action_button);
-        performSaleButton.setText("Make Sale");
-        performSaleButton.setOnClickListener(saleButtonListener);
+        Button performPurchaseButton = (Button) findViewById(R.id.perform_action_button);
+        performPurchaseButton.setText("Purchase");
+        performPurchaseButton.setOnClickListener(purchaseButtonListener);
     }
 
     @Override
@@ -126,15 +126,15 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
     /**
      * Using ASyncTask to change quantity of Items in the database
      */
-    private class MakeSaleASyncTask extends AsyncTask<ArrayList<Item>, Void, Boolean>{
+    private class MakePurchaseASyncTask extends AsyncTask<ArrayList<Item>, Void, Boolean>{
 
         @Override
         protected Boolean doInBackground(ArrayList<Item>... lists) {
-            ArrayList<Item> saleItemsList = lists[0];
+            ArrayList<Item> purchaseItemsList = lists[0];
 
-            for (Item item : saleItemsList) {
+            for (Item item : purchaseItemsList) {
                 ContentValues values = new ContentValues();
-                values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, item.getQuantity() -1);
+                values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, item.getQuantity() + 1);
                 String selection = StockContract.ItemEntry._ID + "=?";
                 String[] selectionArgs = new String[] {String.valueOf(item.getId())};
                 getContentResolver().update(StockContract.ItemEntry.ITEMS_CONTENT_URI,
@@ -145,21 +145,21 @@ public class SaleActivity extends AppCompatActivity implements LoaderManager.Loa
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
-            Toast.makeText(SaleActivity.this, "Sale Successful!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PurchaseActivity.this, "Purchase Successful!", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
-    private View.OnClickListener saleButtonListener = new View.OnClickListener() {
+    private View.OnClickListener purchaseButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             if (itemsList.isEmpty()){
                 //Show error
-                Toast.makeText(getBaseContext(), "Error! Can't make sale with no items!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Error! Can't make purchase with no items!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            MakeSaleASyncTask saleASyncTask = new MakeSaleASyncTask();
-            saleASyncTask.execute(itemsList);
+            MakePurchaseASyncTask purchaseASyncTask = new MakePurchaseASyncTask();
+            purchaseASyncTask.execute(itemsList);
         }
     };
 

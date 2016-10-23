@@ -2,9 +2,10 @@ package xyz.cybersapien.inventorymanager;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
+import android.media.Image;
 import android.net.Uri;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -12,6 +13,7 @@ import android.content.Loader;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,9 +34,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import xyz.cybersapien.inventorymanager.data.StockContract;
 
@@ -49,7 +48,8 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     private EditText nameEditText;
 
     /*Quantity Text Field*/
-    private EditText quantityEditText;
+    private TextView quantityTextView;
+    private Integer quantity;
 
     /*Price Text Field*/
     private EditText priceEditText;
@@ -82,6 +82,13 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
         data = getIntent().getData();
         newItem = data==null;
 
+        quantity = 0;
+        ImageView addQuantityButton = (ImageView) findViewById(R.id.modifier_add);
+        addQuantityButton.setOnClickListener(addQuantity);
+
+        ImageView decQuantityButton = (ImageView) findViewById(R.id.modifier_remove);
+        decQuantityButton.setOnClickListener(decQuantity);
+
         //Initialize the ImageView
         itemImageView = (ImageView) findViewById(R.id.item_image_view);
 
@@ -91,7 +98,8 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
 
         //Initialize the TextFields
         nameEditText = (EditText) findViewById(R.id.item_name_edit_text);
-        quantityEditText = (EditText) findViewById(R.id.item_quantity_edit_text);
+        quantityTextView = (TextView) findViewById(R.id.item_quantity_text_view);
+        quantityTextView.setText(String.valueOf(quantity));
         priceEditText = (EditText) findViewById(R.id.item_price_edit_text);
 
         Button submitButton = (Button) findViewById(R.id.submit_button);
@@ -102,7 +110,6 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
         } else {
             submitButton.setText("Add Item");
         }
-
 
         Log.d(LOG_TAG, "In OnCreate");
 
@@ -168,7 +175,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     ContentValues values = new ContentValues();
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, nameEditText.getText().toString());
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
-                    values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, Integer.parseInt(quantityEditText.getText().toString()));
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID, supplierID);
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
                     getContentResolver().insert(StockContract.ItemEntry.ITEMS_CONTENT_URI, values);
@@ -177,7 +184,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                     ContentValues values = new ContentValues();
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_NAME, nameEditText.getText().toString());
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PRICE, Double.parseDouble(priceEditText.getText().toString()));
-                    values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, Integer.parseInt(quantityEditText.getText().toString()));
+                    values.put(StockContract.ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
                     values.put(StockContract.ItemEntry.COLUMN_ITEM_PICTURE, itemPhotoUri.toString());
                     String where = StockContract.ItemEntry._ID + "=?";
                     String[] whereArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
@@ -203,10 +210,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                 finish();
                 break;
             case R.id.action_delete_this:
-                String where = StockContract.ItemEntry._ID + "=?";
-                String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
-                getContentResolver().delete(StockContract.ItemEntry.ITEMS_CONTENT_URI, where,selectionArgs);
-                finish();
+                showDeleteConfirmationDialog();
                 break;
         }
         return true;
@@ -286,9 +290,7 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void setupSupplierData(Cursor cursor){
-        if(cursor.getCount()==0){
-            return;
-        }else {
+        if(!(cursor.getCount()==0)){
             int emailIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_EMAIL);
             int phoneIndex = cursor.getColumnIndex(StockContract.SuppliersEntry.COLUMN_SUPPLIER_PHONE);
 
@@ -319,7 +321,8 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
             Integer supplierID = cursor.getInt(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_SUPPLIER_ID));
             supplierSpinner.setSelection(supplierID);
             nameEditText.setText(name);
-            quantityEditText.setText(quantity);
+            this.quantity = Integer.parseInt(quantity);
+            quantityTextView.setText(quantity);
             priceEditText.setText(price);
             String pictureEntry = cursor.getString(cursor.getColumnIndex(StockContract.ItemEntry.COLUMN_ITEM_PICTURE));
             if (!TextUtils.isEmpty(pictureEntry)) {
@@ -340,5 +343,56 @@ public class ItemEditorActivity extends AppCompatActivity implements LoaderManag
                 startActivity(intent);
             }
         });
+    }
+
+    private View.OnClickListener addQuantity = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            quantity++;
+            quantityTextView.setText(String.valueOf(quantity));
+        }
+    };
+
+    private View.OnClickListener decQuantity = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            quantity--;
+            quantityTextView.setText(String.valueOf(quantity));
+        }
+    };
+
+    private void showDeleteConfirmationDialog(){
+
+        //Create an AlertDialog and set the message,
+        //and click listeners for the positive and negative buttons
+
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+
+        alertBuilder.setMessage("Delete this Item?");
+        alertBuilder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteItem();
+            }
+        });
+
+        alertBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (dialogInterface != null){
+                    dialogInterface.dismiss();
+                }
+            }
+        });
+
+        AlertDialog deleteAlert = alertBuilder.create();
+        deleteAlert.show();
+    }
+
+    private void deleteItem(){
+        String where = StockContract.ItemEntry._ID + "=?";
+        String[] selectionArgs = new String[] {String.valueOf(ContentUris.parseId(data))};
+        getContentResolver().delete(StockContract.ItemEntry.ITEMS_CONTENT_URI, where,selectionArgs);
+        finish();
     }
 }

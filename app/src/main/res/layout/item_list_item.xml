@@ -25,7 +25,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/item_name_text_view"
             tools:text="Item Name"
-            android:layout_centerHorizontal="true"
             android:fontFamily="sans-serif-medium"
             android:textSize="20sp"
             android:paddingBottom="5dp"
